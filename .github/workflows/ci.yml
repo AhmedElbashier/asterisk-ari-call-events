@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Smoke test mock mode
+        run: |
+          ARI_MODE=mock SIM_INTERVAL_MS=300 PORT=3001 node dist/index.js &
+          sleep 3
+          curl -fsS localhost:3001/health
+          curl -fsS localhost:3001/stats
+      - run: docker build -t asterisk-ari-call-events .

@@ -1,0 +1,26 @@
+# Local lab: Asterisk 22 with ARI enabled + the call-events service.
+# Host networking keeps SIP/RTP simple on Linux. On macOS/Windows use the
+# port mappings in the comments instead and set ARI_URL=http://asterisk:8088.
+services:
+  asterisk:
+    image: andrius/asterisk:22
+    network_mode: host
+    volumes:
+      - ./asterisk/conf/http.conf:/etc/asterisk/http.conf:ro
+      - ./asterisk/conf/ari.conf:/etc/asterisk/ari.conf:ro
+      - ./asterisk/conf/pjsip.conf:/etc/asterisk/pjsip.conf:ro
+      - ./asterisk/conf/extensions.conf:/etc/asterisk/extensions.conf:ro
+    # ports: ["5060:5060/udp", "8088:8088", "10000-10100:10000-10100/udp"]
+
+  call-events:
+    build: .
+    network_mode: host
+    depends_on: [asterisk]
+    restart: on-failure
+    environment:
+      ARI_MODE: ari
+      ARI_URL: http://127.0.0.1:8088
+      ARI_USERNAME: ari
+      ARI_PASSWORD: local-dev-ari-password
+      ARI_APP: call-events
+      PORT: "3001"
