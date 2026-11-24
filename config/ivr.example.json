@@ -1,0 +1,16 @@
+{
+  "welcome": "sound:hello-world",
+  "menu": "sound:vm-enter-num-to-call",
+  "invalid": "sound:option-is-invalid",
+  "closedMessage": "sound:vm-goodbye",
+  "maxRetries": 2,
+  "inputTimeoutMs": 6000,
+  "options": {
+    "1": { "type": "route", "context": "queues", "extension": "sales", "label": "Sales" },
+    "2": { "type": "route", "context": "queues", "extension": "support", "label": "Support" },
+    "9": { "type": "repeat" },
+    "0": { "type": "route", "context": "internal", "extension": "1000", "label": "Operator" }
+  },
+  "fallback": { "type": "route", "context": "internal", "extension": "1000", "label": "Operator" },
+  "businessHours": { "timezone": "Asia/Dubai", "days": [1, 2, 3, 4, 5], "open": "09:00", "close": "18:00" }
+}
