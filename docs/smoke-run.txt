@@ -1,0 +1,10 @@
+## mock-mode smoke run Tue Nov 24 19:37:00 +04 2026
+{"status":"ok","mode":"mock"}
+{"total":7,"active":1,"routed":4,"abandonedInIvr":2}
+sim-7 in-ivr [] None
+sim-6 ended [] None
+sim-5 routed ['7', '2'] Support (queues/support)
+sim-4 routed ['1'] Sales (queues/sales)
+sim-3 routed ['0'] Operator (internal/1000)
+sim-2 ended [] None
+sim-1 routed ['7', '2'] Support (queues/support)
