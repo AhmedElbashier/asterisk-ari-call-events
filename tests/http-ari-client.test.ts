@@ -38,6 +38,14 @@ describe("HttpAriClient", () => {
     expect(calls[0]!.auth).toBe("Basic " + Buffer.from("ari:s3cret").toString("base64"));
   });
 
+  it("keeps a base path such as the http.conf prefix", async () => {
+    const { calls, impl } = recordingFetch();
+    const c = new HttpAriClient({ ...base, url: "http://pbx.local:8088/asterisk/", fetchImpl: impl });
+    expect(c.eventsUrl()).toBe("ws://pbx.local:8088/asterisk/ari/events?app=call-events&subscribeAll=false");
+    await c.answer("chan-2");
+    expect(calls[0]!.url).toBe("http://pbx.local:8088/asterisk/ari/channels/chan-2/answer");
+  });
+
   it("throws on non-2xx responses", async () => {
     const impl = (async () => new Response("nope", { status: 404 })) as unknown as typeof fetch;
     await expect(new HttpAriClient({ ...base, fetchImpl: impl }).answer("x")).rejects.toThrow(/404/);

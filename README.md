@@ -91,7 +91,7 @@ To point at an existing PBX instead, enable ARI there and set
 | Variable | Default | |
 |---|---|---|
 | `ARI_MODE` | `ari` | `mock` uses the fake client + simulator |
-| `ARI_URL` | `http://localhost:8088` | Asterisk HTTP server |
+| `ARI_URL` | `http://localhost:8088` | Asterisk HTTP server. If `http.conf` sets `prefix=asterisk` (or a proxy mounts ARI on a sub-path), include it: `http://pbx:8088/asterisk` |
 | `ARI_USERNAME` / `ARI_PASSWORD` | `ari` / empty | from `ari.conf` |
 | `ARI_APP` | `call-events` | Stasis application name |
 | `PORT` | `3001` | HTTP API port |

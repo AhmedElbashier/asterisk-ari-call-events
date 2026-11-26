@@ -2,7 +2,7 @@ import WebSocket from "ws";
 import type { AriClient, AriEvent, AriEventHandler } from "./types.js";
 
 export interface AriConnectionOptions {
-  url: string; // e.g. http://localhost:8088
+  url: string; // e.g. http://localhost:8088, or http://pbx:8088/asterisk when http.conf sets `prefix`
   username: string;
   password: string;
   app: string; // Stasis application name
@@ -30,8 +30,20 @@ export class HttpAriClient implements AriClient {
     this.handlers.push(handler);
   }
 
+  /**
+   * Resolves an ARI path against the configured base URL, keeping any base path.
+   * `new URL("/ari/x", base)` would drop it, which breaks Asterisk's http.conf `prefix`
+   * option (ARI then lives under /<prefix>/ari) and reverse proxies that mount ARI on a sub-path.
+   */
+  ariUrl(path: string): URL {
+    const u = new URL(this.opts.url);
+    u.pathname = `${u.pathname.replace(/\/+$/, "")}/ari${path}`;
+    u.search = "";
+    return u;
+  }
+
   eventsUrl(): string {
-    const u = new URL("/ari/events", this.opts.url);
+    const u = this.ariUrl("/events");
     u.protocol = u.protocol === "https:" ? "wss:" : "ws:";
     u.searchParams.set("app", this.opts.app);
     u.searchParams.set("subscribeAll", "false");
@@ -67,7 +79,7 @@ export class HttpAriClient implements AriClient {
   }
 
   async request(method: string, path: string, query: Record<string, string | number | undefined> = {}): Promise<unknown> {
-    const u = new URL(`/ari${path}`, this.opts.url);
+    const u = this.ariUrl(path);
     for (const [k, v] of Object.entries(query)) if (v !== undefined) u.searchParams.set(k, String(v));
     const res = await this.fetchImpl(u, { method, headers: { Authorization: this.auth } });
     if (!res.ok) throw new Error(`ARI ${method} ${path} failed: ${res.status}`);
